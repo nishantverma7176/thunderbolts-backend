@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/chat")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:8080", "http://localhost:5500", "exp://172.168.25.164:8081", "http://172.168.25.164:8080", "exp://172.168.25.164:8082"}, allowCredentials = "true")
 public class ChatController {
 
     @Autowired
