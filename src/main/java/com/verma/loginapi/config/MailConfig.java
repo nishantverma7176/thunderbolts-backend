@@ -14,19 +14,21 @@ public class MailConfig {
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
-        // ✅ Brevo (Sendinblue) SMTP Configuration
-        mailSender.setHost("smtp-relay.brevo.com");
-        mailSender.setPort(587);
+        // ✅ Gmail SMTP Configuration
+        mailSender.setHost("smtp.gmail.com");      // Gmail's SMTP server
+        mailSender.setPort(587);                   // TLS port
 
-        // ✅ Replace with your Brevo SMTP username & key
-        mailSender.setUsername("9b7db2001@smtp-brevo.com");  // same as the email verified in Brevo
-        mailSender.setPassword("xsmtpsib-a6717713ef995e386dc1a836a0f207703004b5b3b96613e7a7b5bda55407b26a-4HBTujDncLFPv84d"); // Brevo SMTP Key (not your account password)
+        // ✅ Replace with your Gmail credentials
+        mailSender.setUsername("divyatulsi97@gmail.com");        // your Gmail address
+        mailSender.setPassword("admhgcxzmxcfydgo");           // 16-character App Password
 
+        // ✅ Mail properties
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "false");
+        props.put("mail.smtp.starttls.required", "true");
+        props.put("mail.debug", "false"); // change to true if you want to see detailed logs
 
         return mailSender;
     }
