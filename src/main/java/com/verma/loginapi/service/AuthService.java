@@ -34,14 +34,14 @@ public class AuthService {
 
     private static final int OTP_EXPIRY_MINUTES = 10;
 
-    // ✅ Register
+    // Register
     public AuthResponse register(RegisterRequest registerRequest) {
         try {
             User newUser = new User(
                     registerRequest.getName(),
                     registerRequest.getEmail(),
                     registerRequest.getPhoneNumber(),
-                    registerRequest.getPassword() // no encoding here
+                    registerRequest.getPassword()
             );
 
             User saved = userService.registerUser(newUser);
@@ -59,19 +59,12 @@ public class AuthService {
         }
     }
 
-    // ✅ Login
+    // Login
     public AuthResponse login(LoginRequest request) {
         Optional<User> userOpt = userService.findByEmailOrPhoneNumber(request.getUsername());
-
         if (userOpt.isEmpty()) return new AuthResponse(false, "Invalid credentials");
 
         User user = userOpt.get();
-
-        // Debug if needed
-        // System.out.println("Entered: " + request.getPassword());
-        // System.out.println("Stored: " + user.getPassword());
-        // System.out.println("Match: " + passwordEncoder.matches(request.getPassword(), user.getPassword()));
-
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return new AuthResponse(false, "Invalid credentials");
         }
@@ -79,7 +72,6 @@ public class AuthService {
         AuthResponse.UserData userData = new AuthResponse.UserData(
                 user.getId(), user.getName(), user.getEmail(), user.getPhoneNumber()
         );
-
         return new AuthResponse(true, "Login successful", userData, generateToken(user));
     }
 
@@ -87,7 +79,7 @@ public class AuthService {
         return "jwt-token-" + user.getId() + "-" + System.currentTimeMillis();
     }
 
-    // ✅ Forgot password
+    // Forgot password
     public ApiResponse forgotPassword(ForgotPasswordRequest request) {
         Optional<User> userOpt = userService.findByEmailOrPhoneNumber(request.getEmail());
         if (userOpt.isEmpty()) return new ApiResponse(false, "No user found with that email");
@@ -104,13 +96,13 @@ public class AuthService {
         emailService.sendSimpleMessage(
                 request.getEmail(),
                 "Your OTP Code",
-                "Your OTP is " + otp + ". It will expire in 10 minutes."
+                otp
         );
 
         return new ApiResponse(true, "OTP sent successfully");
     }
 
-    // ✅ Verify OTP
+    // Verify OTP
     public ApiResponse verifyOtp(VerifyOtpRequest request) {
         Optional<PasswordResetToken> token = passwordResetRepository.findByEmailAndOtp(request.getEmail(), request.getOtp());
         if (token.isEmpty() || token.get().getExpiryAt().isBefore(LocalDateTime.now())) {
@@ -119,7 +111,7 @@ public class AuthService {
         return new ApiResponse(true, "OTP verified");
     }
 
-    // ✅ Reset password
+    // Reset password
     @Transactional
     public ApiResponse resetPassword(ResetPasswordRequest request) {
         Optional<PasswordResetToken> tokenOpt = passwordResetRepository.findByEmailAndOtp(request.getEmail(), request.getOtp());
@@ -137,7 +129,7 @@ public class AuthService {
         return new ApiResponse(true, "Password reset successful");
     }
 
-    // ✅ Change password
+    // Change password
     public ApiResponse changePassword(ChangePasswordRequest request) {
         User user = userService.findByEmailOrPhoneNumber(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
